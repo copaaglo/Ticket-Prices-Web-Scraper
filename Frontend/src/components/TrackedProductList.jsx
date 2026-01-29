@@ -25,6 +25,7 @@ const TrackedProductList = () => {
   };
 
   const handleAddTrackedProduct = async () => {
+    if (!newTrackedProduct.trim()) return;
     try {
       const response = await axios.post("/api/tracked", {
         name: newTrackedProduct,
@@ -52,29 +53,49 @@ const TrackedProductList = () => {
     }
   };
 
-  return (
-    <div>
-      <h2>Tracked Products</h2>
-      <ul>
-        {trackedProducts.map((product) => (
-          <li key={product.id}>
-            {product.name}{" "}
-            <button onClick={() => handleDeleteTrackedProduct(product.id)}>
-              Remove
-            </button>
-          </li>
-        ))}
-      </ul>
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      handleAddTrackedProduct();
+    }
+  };
 
-      <div>
-        <h3>Add Tracked Product</h3>
+  return (
+    <div className="tracked-section">
+      <h2>Tracked Artists</h2>
+      
+      <div className="tracked-form">
         <input
           type="text"
+          className="tracked-input"
           value={newTrackedProduct}
           onChange={handleNewTrackedProductChange}
+          onKeyPress={handleKeyPress}
+          placeholder="Add an artist to track..."
         />
-        <button onClick={handleAddTrackedProduct}>Add</button>
+        <button className="add-button" onClick={handleAddTrackedProduct}>
+          Add
+        </button>
       </div>
+      
+      {trackedProducts.length > 0 ? (
+        <div className="tracked-list">
+          {trackedProducts.map((product) => (
+            <div key={product.id} className="tracked-item">
+              <span>{product.name}</span>
+              <button 
+                className="delete-button"
+                onClick={() => handleDeleteTrackedProduct(product.id)}
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p style={{ color: 'var(--muted-foreground)', fontSize: '0.9rem' }}>
+          No artists tracked yet. Add one above to get started.
+        </p>
+      )}
     </div>
   );
 };
