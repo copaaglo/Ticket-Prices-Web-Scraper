@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import TrackedProductList from "./components/TrackedProductList";
+import TrackedEventList from "./components/TrackedEventList";
 import "./App.css";
 
 function App() {
@@ -9,6 +9,7 @@ function App() {
   const [cityFilter, setCityFilter] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [refreshTracked, setRefreshTracked] = useState(0);
 
   const handleArtistNameChange = (event) => {
     setArtistName(event.target.value);
@@ -49,6 +50,20 @@ function App() {
   const formatPrice = (price) => {
     if (price === null || price === undefined) return "Price TBD";
     return `$${price.toFixed(2)}`;
+  };
+
+  const handleDragStart = (event, listing) => {
+    event.dataTransfer.setData("application/json", JSON.stringify(listing));
+    event.dataTransfer.effectAllowed = "copy";
+    event.target.classList.add("dragging");
+  };
+
+  const handleDragEnd = (event) => {
+    event.target.classList.remove("dragging");
+  };
+
+  const triggerRefresh = () => {
+    setRefreshTracked(prev => prev + 1);
   };
 
   return (
@@ -94,14 +109,14 @@ function App() {
               </div>
               
               <div className="input-group">
-                <label htmlFor="city">City (optional)</label>
+                <label htmlFor="city">Preferred City</label>
                 <input
                   id="city"
                   type="text"
                   className="search-input"
                   value={cityFilter}
                   onChange={handleCityChange}
-                  placeholder="e.g., New York, LA..."
+                  placeholder="e.g., Toronto, NYC..."
                 />
               </div>
             </div>
@@ -130,21 +145,34 @@ function App() {
           </div>
         )}
 
+        {searchResults?.city_suggestion && (
+          <div className="alert alert-info">
+            {searchResults.city_suggestion}
+          </div>
+        )}
+
         {searchResults && (
           <div className="results-section">
             <div className="results-header">
               <h2>
                 Results for "{searchResults.artist}"
-                {searchResults.city && ` in ${searchResults.city}`}
+                {searchResults.nearest_city && ` near ${searchResults.nearest_city}`}
+                {!searchResults.nearest_city && searchResults.city && ` in ${searchResults.city}`}
               </h2>
-              <p>Found {searchResults.total_results} events</p>
+              <p>Found {searchResults.total_results} events - drag events to save them</p>
             </div>
             
             {searchResults.cheapest && searchResults.cheapest.price && (
-              <div className="best-deal-card">
+              <div 
+                className="best-deal-card draggable-event"
+                draggable
+                onDragStart={(e) => handleDragStart(e, searchResults.cheapest)}
+                onDragEnd={handleDragEnd}
+              >
                 <span className="best-deal-badge">
                   <span>★</span> Best Deal
                 </span>
+                <div className="drag-hint">Drag to save</div>
                 <div className="best-deal-price">
                   {formatPrice(searchResults.cheapest.price)}
                 </div>
@@ -159,6 +187,7 @@ function App() {
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="buy-button"
+                  onClick={(e) => e.stopPropagation()}
                 >
                   Get Tickets →
                 </a>
@@ -173,7 +202,13 @@ function App() {
                 </h3>
                 <div className="events-grid">
                   {searchResults.listings.map((listing, index) => (
-                    <div key={index} className="event-card">
+                    <div 
+                      key={index} 
+                      className="event-card draggable-event"
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, listing)}
+                      onDragEnd={handleDragEnd}
+                    >
                       <div className="event-info">
                         <div className="event-title">{listing.name}</div>
                         <div className="event-venue">{listing.venue}</div>
@@ -196,10 +231,12 @@ function App() {
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="view-button"
+                          onClick={(e) => e.stopPropagation()}
                         >
                           View →
                         </a>
                       </div>
+                      <div className="drag-indicator">⋮⋮</div>
                     </div>
                   ))}
                 </div>
@@ -217,7 +254,7 @@ function App() {
 
         <div className="divider"></div>
 
-        <TrackedProductList />
+        <TrackedEventList refreshTrigger={refreshTracked} onEventAdded={triggerRefresh} />
       </div>
     </>
   );

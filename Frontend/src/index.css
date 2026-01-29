@@ -623,3 +623,183 @@ body {
     font-size: 2rem;
   }
 }
+
+.alert-info {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
+}
+
+.draggable-event {
+  cursor: grab;
+  position: relative;
+}
+
+.draggable-event:active {
+  cursor: grabbing;
+}
+
+.draggable-event.dragging {
+  opacity: 0.5;
+  transform: scale(0.98);
+}
+
+.drag-indicator {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted-foreground);
+  font-size: 1.2rem;
+  opacity: 0.4;
+  user-select: none;
+}
+
+.event-card:hover .drag-indicator {
+  opacity: 0.8;
+}
+
+.drag-hint {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 0.7rem;
+  color: #166534;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 2px 8px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.best-deal-card:hover .drag-hint {
+  opacity: 1;
+}
+
+.tracked-section {
+  width: 100%;
+  background: var(--card);
+  border: 2px dashed var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  transition: all 0.3s ease;
+  min-height: 200px;
+}
+
+.tracked-section.drag-over {
+  border-color: var(--primary);
+  background: rgba(102, 126, 234, 0.05);
+  transform: scale(1.01);
+}
+
+.tracked-section h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--foreground);
+  margin-bottom: 8px;
+}
+
+.drop-hint {
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  margin-bottom: 20px;
+}
+
+.tracked-section.drag-over .drop-hint {
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.tracked-events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tracked-event-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: var(--secondary);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+
+.tracked-event-card:hover {
+  border-color: var(--muted-foreground);
+}
+
+.tracked-event-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.tracked-event-title {
+  font-weight: 600;
+  color: var(--foreground);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tracked-event-details {
+  font-size: 0.85rem;
+  color: var(--muted-foreground);
+  margin-bottom: 6px;
+}
+
+.tracked-event-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tracked-event-price {
+  font-weight: 600;
+  color: #16a34a;
+}
+
+.tracked-event-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.empty-tracked {
+  text-align: center;
+  padding: 30px 20px;
+  color: var(--muted-foreground);
+}
+
+.empty-icon {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+  opacity: 0.6;
+}
+
+.empty-tracked p {
+  margin: 0;
+}
+
+.empty-hint {
+  font-size: 0.85rem;
+  margin-top: 6px !important;
+  opacity: 0.8;
+}
+
+@media (max-width: 640px) {
+  .tracked-event-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .tracked-event-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

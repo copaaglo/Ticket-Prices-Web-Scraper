@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from services.ticket_search import search_all_platforms
+from services.city_search import find_nearest_city_with_events
 from models.artist_search import ArtistSearch
 from models import db
 from datetime import datetime, timezone
@@ -13,7 +14,7 @@ def search_tickets():
     Search for tickets across all platforms.
     Query params:
       - artist (required): Artist or event name to search
-      - city (optional): City to filter by
+      - city (optional): City to filter by - will find nearest city with events if none found
     """
     artist = (request.args.get("artist") or "").strip()
     city = (request.args.get("city") or "").strip() or None
@@ -27,7 +28,10 @@ def search_tickets():
     ))
     db.session.commit()
     
-    results = search_all_platforms(artist, city)
+    if city:
+        results = find_nearest_city_with_events(city, search_all_platforms, artist)
+    else:
+        results = search_all_platforms(artist, city)
     
     return jsonify({
         "ok": True,
