@@ -1,2 +1,3 @@
 Project Info
 This project provides users to interact with an automated price tacking web scraper. Currenlty the trackers scaresp SeatGeek, Ticketmaster, and Gametime to find the cheapest prices for sporting events, concerts and etc.
+# Ticket-Prices-Web-Scraper
