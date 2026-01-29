@@ -11,11 +11,10 @@ const TrackedProductList = () => {
 
   const fetchTrackedProducts = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:5000/tracked-products"
-      );
-
-      setTrackedProducts(response.data);
+      const response = await axios.get("/api/tracked");
+      if (response.data.ok) {
+        setTrackedProducts(response.data.tracked || []);
+      }
     } catch (error) {
       console.error("Error fetching tracked products:", error);
     }
@@ -27,35 +26,29 @@ const TrackedProductList = () => {
 
   const handleAddTrackedProduct = async () => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/add-tracked-product",
-        {
-          name: newTrackedProduct,
-        }
-      );
-      const { id } = response.data;
-      setTrackedProducts((prevProducts) => [
-        ...prevProducts,
-        { id, name: newTrackedProduct, tracked: true },
-      ]);
-      setNewTrackedProduct("");
+      const response = await axios.post("/api/tracked", {
+        name: newTrackedProduct,
+      });
+      if (response.data.ok) {
+        setTrackedProducts((prevProducts) => [
+          ...prevProducts,
+          response.data.tracked,
+        ]);
+        setNewTrackedProduct("");
+      }
     } catch (error) {
       console.error("Error adding tracked product:", error);
     }
   };
 
-  const handleToggleTrackedProduct = async (productId) => {
+  const handleDeleteTrackedProduct = async (productId) => {
     try {
-      await axios.put(`http://localhost:5000/tracked-product/${productId}`);
+      await axios.delete(`/api/tracked/${productId}`);
       setTrackedProducts((prevProducts) =>
-        prevProducts.map((product) =>
-          product.id === productId
-            ? { ...product, tracked: !product.tracked }
-            : product
-        )
+        prevProducts.filter((product) => product.id !== productId)
       );
     } catch (error) {
-      console.error("Error toggling tracked product:", error);
+      console.error("Error deleting tracked product:", error);
     }
   };
 
@@ -66,11 +59,9 @@ const TrackedProductList = () => {
         {trackedProducts.map((product) => (
           <li key={product.id}>
             {product.name}{" "}
-            <input
-              type="checkbox"
-              onChange={() => handleToggleTrackedProduct(product.id)}
-              checked={product.tracked}
-            />
+            <button onClick={() => handleDeleteTrackedProduct(product.id)}>
+              Remove
+            </button>
           </li>
         ))}
       </ul>
