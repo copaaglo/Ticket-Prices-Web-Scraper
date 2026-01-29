@@ -47,5 +47,5 @@ externalPort = 3001
 
 [deployment]
 deploymentTarget = "autoscale"
-run = ["bash", "-c", "cd Backend && gunicorn --bind=0.0.0.0:5000 app:app"]
-build = ["bash", "-c", "cd Frontend && npm install --legacy-peer-deps && npm run build"]
+run = ["sh", "-c", "bash -lc \"cd Frontend && npm start\""]
+build = ["sh", "-c", "bash -lc \"cd Frontend && npm install && npm run build\""]
