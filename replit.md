@@ -37,7 +37,16 @@ The React frontend proxies API requests to the Flask backend.
 - `POST /api/tracked` - Add a tracked artist
 - `DELETE /api/tracked/:id` - Remove a tracked artist
 
+## Environment Variables Required
+- `TICKETMASTER_API_KEY`: API key from Ticketmaster Developer Portal (https://developer.ticketmaster.com/)
+- `SEATGEEK_CLIENT_ID`: Client ID from SeatGeek Developer (https://seatgeek.com/account/develop)
+
+Note: Gametime does not offer a public API, so ticket data cannot be fetched from that platform.
+
 ## Recent Changes
+- Added API-based ticket search using Ticketmaster and SeatGeek APIs
+- Added city filter option for location-based searches
+- Improved UI with better styling and result cards
 - Fixed circular import issues in models
 - Updated frontend to use correct API endpoints
 - Configured React for Replit proxy compatibility
