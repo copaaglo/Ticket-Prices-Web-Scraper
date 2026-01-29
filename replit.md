@@ -44,9 +44,14 @@ The React frontend proxies API requests to the Flask backend.
 Note: Gametime does not offer a public API, so ticket data cannot be fetched from that platform.
 
 ## Recent Changes
+- **UI Redesign (Jan 2026)**: Implemented modern v0-style design with:
+  - Animated SVG blob backgrounds with blur effect
+  - Light theme with purple accent colors
+  - Clean card-based layouts with rounded corners
+  - Modern form styling with hover/focus states
+  - Responsive design for mobile devices
 - Added API-based ticket search using Ticketmaster and SeatGeek APIs
 - Added city filter option for location-based searches
-- Improved UI with better styling and result cards
 - Fixed circular import issues in models
 - Updated frontend to use correct API endpoints
 - Configured React for Replit proxy compatibility
