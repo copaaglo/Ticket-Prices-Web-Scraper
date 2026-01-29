@@ -1,16 +1,12 @@
 {
   "version": 2,
+  "buildCommand": "cd Frontend && npm install --legacy-peer-deps && npm run build",
+  "outputDirectory": "Frontend/build",
+  "framework": null,
   "builds": [
     {
       "src": "app.py",
       "use": "@vercel/python"
-    },
-    {
-      "src": "Frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "build"
-      }
     }
   ],
   "routes": [
@@ -19,8 +15,12 @@
       "dest": "app.py"
     },
     {
+      "src": "/(.*\\.(js|css|ico|png|jpg|jpeg|svg|json|txt|woff|woff2))",
+      "dest": "Frontend/build/$1"
+    },
+    {
       "src": "/(.*)",
-      "dest": "Frontend/$1"
+      "dest": "Frontend/build/index.html"
     }
   ]
 }
