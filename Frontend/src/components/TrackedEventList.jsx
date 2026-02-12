@@ -1,24 +1,27 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+
+const STORAGE_KEY = "trackedEvents";
+
+const loadFromStorage = () => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveToStorage = (events) => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(events));
+};
 
 const TrackedEventList = ({ refreshTrigger, onEventAdded }) => {
   const [trackedEvents, setTrackedEvents] = useState([]);
   const [isDragOver, setIsDragOver] = useState(false);
 
   useEffect(() => {
-    fetchTrackedEvents();
+    setTrackedEvents(loadFromStorage());
   }, [refreshTrigger]);
-
-  const fetchTrackedEvents = async () => {
-    try {
-      const response = await axios.get("/api/tracked");
-      if (response.data.ok) {
-        setTrackedEvents(response.data.tracked || []);
-      }
-    } catch (error) {
-      console.error("Error fetching tracked events:", error);
-    }
-  };
 
   const handleDragOver = (event) => {
     event.preventDefault();
@@ -31,14 +34,25 @@ const TrackedEventList = ({ refreshTrigger, onEventAdded }) => {
     setIsDragOver(false);
   };
 
-  const handleDrop = async (event) => {
+  const handleDrop = (event) => {
     event.preventDefault();
     setIsDragOver(false);
     
     try {
       const eventData = JSON.parse(event.dataTransfer.getData("application/json"));
-      
-      const response = await axios.post("/api/tracked", {
+
+      const existing = loadFromStorage();
+      const alreadyTracked = existing.some(
+        (e) =>
+          e.name === eventData.name &&
+          e.event_date === eventData.event_date &&
+          e.venue === eventData.venue
+      );
+
+      if (alreadyTracked) return;
+
+      const newEvent = {
+        id: Date.now(),
         name: eventData.name,
         event_date: eventData.event_date,
         venue: eventData.venue,
@@ -48,24 +62,22 @@ const TrackedEventList = ({ refreshTrigger, onEventAdded }) => {
         url: eventData.url,
         platform: eventData.platform,
         image: eventData.image,
-      });
-      
-      if (response.data.ok) {
-        setTrackedEvents((prev) => [response.data.tracked, ...prev]);
-        if (onEventAdded) onEventAdded();
-      }
+        created_at: new Date().toISOString(),
+      };
+
+      const updated = [newEvent, ...existing];
+      saveToStorage(updated);
+      setTrackedEvents(updated);
+      if (onEventAdded) onEventAdded();
     } catch (error) {
       console.error("Error adding tracked event:", error);
     }
   };
 
-  const handleDeleteTrackedEvent = async (eventId) => {
-    try {
-      await axios.delete(`/api/tracked/${eventId}`);
-      setTrackedEvents((prev) => prev.filter((event) => event.id !== eventId));
-    } catch (error) {
-      console.error("Error deleting tracked event:", error);
-    }
+  const handleDeleteTrackedEvent = (eventId) => {
+    const updated = trackedEvents.filter((event) => event.id !== eventId);
+    saveToStorage(updated);
+    setTrackedEvents(updated);
   };
 
   const formatPrice = (price) => {
